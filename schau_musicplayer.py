@@ -50,6 +50,7 @@ class Application (Frame):
         self.prev_btn.grid(row=1, column=1)
         self.stop_btn.grid(row=1, column=5)
         self.playlist_box.grid(row=2,column=3)
+        self.pack()
 root = tk.Tk()
 root.title("Music Player")
 app = Application(root)
