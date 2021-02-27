@@ -34,16 +34,15 @@ class Application (Frame):
         self.stop_btn_img = PhotoImage(file='imgs/stop_img.png')
         #initialize playlist box
         self.playlist_box = Listbox(self, bg="white", fg="black", width=65, height=20)
-        
         #initialize buttons
         self.buttons_frame = Frame(self)
-        self.play_btn = Button(image=self.play_btn_img, borderwidth=0, command=lambda:play())
-        self.pause_btn = Button(image=self.pause_btn_img, borderwidth=0)
-        self.skip_btn = Button(image=self.skip_btn_img, borderwidth=0)
-        self.prev_btn = Button(image=self.prev_btn_img, borderwidth=0)
-        self.stop_btn = Button(image=self.stop_btn_img, borderwidth=0, command=lambda:stop())
+        self.play_btn = Button(self.buttons_frame, image=self.play_btn_img, borderwidth=0, command=lambda:play())
+        self.pause_btn = Button(self.buttons_frame, image=self.pause_btn_img, borderwidth=0)
+        self.skip_btn = Button(self.buttons_frame, image=self.skip_btn_img, borderwidth=0)
+        self.prev_btn = Button(self.buttons_frame, image=self.prev_btn_img, borderwidth=0)
+        self.stop_btn = Button(self.buttons_frame, image=self.stop_btn_img, borderwidth=0, command=lambda:stop())
         #button grid placements
-
+        self.buttons_frame.grid(row=1)
         self.play_btn.grid(row=1, column=2)
         self.pause_btn.grid(row=1, column=3)
         self.skip_btn.grid(row=1, column=4)
