@@ -4,20 +4,33 @@ from tkinter import filedialog
 import pygame
 from tinytag import TinyTag 
 
+
 class Application (Frame):
     def __init__(self, master):
         super(Application, self).__init__(master)
         pygame.mixer.init()
-        global paused
+       
+        global paused 
+        paused = False
+        playlist = []
         #button functions/definitions
         def play():
-            paused = FALSE
-            pygame.mixer.music.load("")
+            paused = False
+            pygame.mixer.music.stop()
+            song = self.playlist_box.curselection()
+            pygame.mixer.music.load(playlist[int(song[0])])
             pygame.mixer.music.play(loops=0)
             
-        def pause():
-            paused = TRUE
-            pygame.mixer.music.pause()
+        
+        def pause(is_paused):
+            global paused 
+            paused = is_paused
+            if paused:
+                pygame.mixer.music.unpause()
+                paused = False
+            else:
+                pygame.mixer.music.pause()
+                paused = True
         
         def skip():
             return
@@ -27,17 +40,19 @@ class Application (Frame):
         
         def stop():
             pygame.mixer.music.stop()
+            self.playlist_box.selection_clear(ACTIVE)
 
         def add_song():
             #get song file directory
-            song_file = filedialog.askopenfilename(initialdir='Music/', title='Select a song', filetypes=(("mp3 Files", "*.mp3"), ("WAV Files", "*.wav"), ("FLAC Files", "*.flac")))
+            song_file = filedialog.askopenfilename(initialdir='Music/', title='Select a song', filetypes=(("mp3 Files", "*.mp3"), ("wav Files", "*.wav")))
+            playlist.append(song_file)
             #get song file metadata
             tag = TinyTag.get(song_file)
             #get song file metadata title
             song = tag.title
             #add song to playlist
             self.playlist_box.insert(END, song)
-            
+
         #button images
         self.play_btn_img = PhotoImage(file='imgs/play_img.png')
         self.pause_btn_img = PhotoImage(file='imgs/pause_img.png')
@@ -46,19 +61,19 @@ class Application (Frame):
         self.stop_btn_img = PhotoImage(file='imgs/stop_img.png')
 
         #initialize playlist area items
-        self.playlist_box = Listbox(self, bg="white", fg="black", width=65, height=20)
+        self.playlist_box = Listbox(self, bg="white", fg="black", width=65, height=20, selectbackground="dodger blue", selectforeground="white")
         self.playlist = Menu(self)
         master.config(menu=self.playlist)
 
         #Add song playlist
-        self.add_song_playlist = Menu(self.playlist)
-        self.playlist.add_cascade(label="Add Songs", menu=self.add_song_playlist)
+        self.add_song_playlist = Menu(self.playlist, tearoff=0)
+        self.playlist.add_cascade(label="File", menu=self.add_song_playlist)
         self.add_song_playlist.add_command(label="Add song to playlist", command=lambda:add_song())
 
         #initialize buttons
         self.buttons_frame = Frame(self)
         self.play_btn = Button(self.buttons_frame, image=self.play_btn_img, borderwidth=0, command=lambda:play())
-        self.pause_btn = Button(self.buttons_frame, image=self.pause_btn_img, borderwidth=0)
+        self.pause_btn = Button(self.buttons_frame, image=self.pause_btn_img, borderwidth=0, command=lambda:pause(paused))
         self.skip_btn = Button(self.buttons_frame, image=self.skip_btn_img, borderwidth=0)
         self.prev_btn = Button(self.buttons_frame, image=self.prev_btn_img, borderwidth=0)
         self.stop_btn = Button(self.buttons_frame, image=self.stop_btn_img, borderwidth=0, command=lambda:stop())
@@ -76,5 +91,5 @@ class Application (Frame):
 root = tk.Tk()
 root.title("Music Player")
 app = Application(root)
-#root.geometry("500x400")
+root.geometry("500x400")
 root.mainloop()
