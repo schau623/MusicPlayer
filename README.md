@@ -5,9 +5,9 @@ Current Functions:
       - Pause  
       - Stop  
       - Add songs  
+      - Skip song  
+      - Prev song  
 To Add:  
       - Remove songs from playlist  
-      - Fast forward/skip  
-      - Previous  
       - Volume slider  
       - Song position slider  
