@@ -44,14 +44,15 @@ class Application (Frame):
 
         def add_song():
             #get song file directory
-            song_file = filedialog.askopenfilename(initialdir='Music/', title='Select a song', filetypes=(("mp3 Files", "*.mp3"), ("wav Files", "*.wav")))
-            playlist.append(song_file)
-            #get song file metadata
-            tag = TinyTag.get(song_file)
-            #get song file metadata title
-            song = tag.title
-            #add song to playlist
-            self.playlist_box.insert(END, song)
+            file = filedialog.askopenfilenames(initialdir='Music/', title='Select a song', filetypes=(("mp3 Files", "*.mp3"), ("wav Files", "*.wav")))
+            song_tuple = master.splitlist(file)
+            song_list = list(song_tuple)
+            #iterate through song list and add songs to playlist
+            for song in song_list:
+                playlist.append(song)
+                tag = TinyTag.get(song)
+                song_title = tag.title
+                self.playlist_box.insert(END, song_title)
 
         #button images
         self.play_btn_img = PhotoImage(file='imgs/play_img.png')
