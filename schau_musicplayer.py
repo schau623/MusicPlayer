@@ -33,10 +33,22 @@ class Application (Frame):
                 paused = True
         
         def skip():
-            return
+            next_song = self.playlist_box.curselection()
+            next_song = next_song[0]+1
+            pygame.mixer.music.load(playlist[next_song])
+            pygame.mixer.music.play(loops=0)
+            self.playlist_box.selection_clear(0, END)
+            self.playlist_box.activate(next_song)
+            self.playlist_box.selection_set(next_song, last=None)
 
         def prev():
-            return
+            prev_song = self.playlist_box.curselection()
+            prev_song = prev_song[0]-1
+            pygame.mixer.music.load(playlist[prev_song])
+            pygame.mixer.music.play(loops=0)
+            self.playlist_box.selection_clear(0, END)
+            self.playlist_box.activate(prev_song)
+            self.playlist_box.selection_set(prev_song, last=None)
         
         def stop():
             pygame.mixer.music.stop()
@@ -75,8 +87,8 @@ class Application (Frame):
         self.buttons_frame = Frame(self)
         self.play_btn = Button(self.buttons_frame, image=self.play_btn_img, borderwidth=0, command=lambda:play())
         self.pause_btn = Button(self.buttons_frame, image=self.pause_btn_img, borderwidth=0, command=lambda:pause(paused))
-        self.skip_btn = Button(self.buttons_frame, image=self.skip_btn_img, borderwidth=0)
-        self.prev_btn = Button(self.buttons_frame, image=self.prev_btn_img, borderwidth=0)
+        self.skip_btn = Button(self.buttons_frame, image=self.skip_btn_img, borderwidth=0, command=lambda:skip())
+        self.prev_btn = Button(self.buttons_frame, image=self.prev_btn_img, borderwidth=0, command=lambda:prev())
         self.stop_btn = Button(self.buttons_frame, image=self.stop_btn_img, borderwidth=0, command=lambda:stop())
 
         #UI item placements
