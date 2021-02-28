@@ -21,7 +21,6 @@ class Application (Frame):
             pygame.mixer.music.load(playlist[int(song[0])])
             pygame.mixer.music.play(loops=0)
             
-        
         def pause(is_paused):
             global paused 
             paused = is_paused
@@ -65,6 +64,14 @@ class Application (Frame):
                 tag = TinyTag.get(song)
                 song_title = tag.title
                 self.playlist_box.insert(END, song_title)
+        
+        def remove_song():
+            self.playlist_box.delete(ANCHOR)
+            pygame.mixer.music.stop()
+
+        def clear_playlist():
+            self.playlist_box.delete(0, END)
+            pygame.mixer.music.stop()
 
         #button images
         self.play_btn_img = PhotoImage(file='imgs/play_img.png')
@@ -73,15 +80,20 @@ class Application (Frame):
         self.prev_btn_img = PhotoImage(file='imgs/prev_img.png')
         self.stop_btn_img = PhotoImage(file='imgs/stop_img.png')
 
-        #initialize playlist area items
+        #initialize playlist area and menu
         self.playlist_box = Listbox(self, bg="white", fg="black", width=65, height=20, selectbackground="dodger blue", selectforeground="white")
-        self.playlist = Menu(self)
-        master.config(menu=self.playlist)
-
-        #Add song playlist
-        self.add_song_playlist = Menu(self.playlist, tearoff=0)
-        self.playlist.add_cascade(label="File", menu=self.add_song_playlist)
-        self.add_song_playlist.add_command(label="Add song to playlist", command=lambda:add_song())
+       
+        #menu bar
+        self.menu_ = Menu(self)
+        master.config(menu=self.menu_)
+        self.file_menu = Menu(self.menu_, tearoff=0)
+        self.menu_.add_cascade(label="File", menu=self.file_menu)
+        self.file_menu.add_command(label="Add Song(s) to Playlist", command=lambda:add_song())
+        self.file_menu.add_command(label="Remove Selected Song from Playlist", command=lambda:remove_song())
+        self.file_menu.add_command(label="Clear Playlist", command=lambda:clear_playlist())
+        
+        self.file_menu.add_separator()
+        self.file_menu.add_command(label="Exit", command=master.quit)
 
         #initialize buttons
         self.buttons_frame = Frame(self)
