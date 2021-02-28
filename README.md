@@ -7,7 +7,5 @@ Current Functions:
       - Add songs  
 To Add:  
       - Remove songs from playlist  
-      - Fast forward/skip  
-      - Previous  
       - Volume slider  
       - Song position slider  
