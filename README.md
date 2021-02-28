@@ -8,6 +8,6 @@ Current Functions:
       - Skip song  
       - Prev song  
       - Remove songs from playlist   
-      - Song position slider 
+      - Song position slider  
 To Add:  
       - Volume slider  
