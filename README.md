@@ -7,7 +7,7 @@ Current Functions:
       - Add songs  
       - Skip song  
       - Prev song  
+      - Remove songs from playlist   
 To Add:  
-      - Remove songs from playlist  
       - Volume slider  
       - Song position slider  
