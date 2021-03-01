@@ -18,6 +18,7 @@ class Application (Frame):
         playlist = []
         pygame.mixer.music.set_volume(0.1)
         #button/menu functions
+        
         def play():
             global paused
             paused = False
@@ -89,13 +90,13 @@ class Application (Frame):
         def remove_song():
             self.playlist_box.delete(ANCHOR)
             playlist.remove(ANCHOR)
-            pygame.mixer.music.stop()
+            stop()
 
         def clear_playlist():
             self.playlist_box.delete(0, END)
             for i in range (len(playlist)):
                 playlist.pop()
-            pygame.mixer.music.stop()
+            stop()
 
         #song position time function
         def play_time():
@@ -108,7 +109,6 @@ class Application (Frame):
                 #update time
                 #self.position_bar.after(1000, play_time)
                 
-
                 #get song length
                 current_song = self.playlist_box.curselection()
                 song_mut = MP3(playlist[int(current_song[0])])
@@ -119,6 +119,7 @@ class Application (Frame):
                 #self.length_bar.after(1000, play_time)
                 current_time+=1
 
+                #Update slider while song plays
                 if int(self.position_slider.get())==int(song_length):
                     self.slider_label.config(text=converted_song_length)
                 
@@ -132,7 +133,7 @@ class Application (Frame):
                 else: #update slider to current position in song
                     slider_position = int(song_length)
                     self.position_slider.config(to=slider_position, value=int(self.position_slider.get()))
-                    converted_time = time.strftime('%H:%M:%S', time.gmtime(int(self.position_slider.get())))
+                    converted_time = time.strftime('%M:%S', time.gmtime(int(self.position_slider.get())))
                     self.slider_label.config(text=converted_time)
 
                     next_time = int(self.position_slider.get())+1
@@ -145,16 +146,72 @@ class Application (Frame):
             pygame.mixer.music.load(playlist[int(song[0])])
             pygame.mixer.music.play(loops=0, start=int(self.position_slider.get()))
 
+        def volume(x):
+           pygame.mixer.music.set_volume(self.volume_slider.get())
+           current_volume = pygame.mixer.music.get_volume()
+           current_volume = current_volume*100
+
+        #create_frames
+        """FRAME INITIALIZATION"""
+        #initialization
+        self.controls_frame = Frame(self)
+        self.playlist_frame = LabelFrame(self, text=f'Playlist - {str(len(playlist))}',bd=5,relief=tk.GROOVE)
+        self.playlist_frame.config(width=190,height=400)
+        self.song_slider_frame = Frame(self)
+        self.display_frame = LabelFrame(self)
+        
+        #frame grid placements
+        self.controls_frame.grid(row=2, column=0, padx=10)
+        self.playlist_frame.config(width=190, height=400)
+        self.playlist_frame.grid(row=0,column=1, rowspan=3, pady=5)
+        #self.song_slider_frame.grid(row=1, column=0)
+        self.song_slider_frame.place(x=20, y=250, height=30)
+        self.display_frame.grid(row=0, column=0)
+
+        """CONTROL INITIALIZATION"""
         #button images
         self.play_btn_img = PhotoImage(file='imgs/play_img.png')
         self.pause_btn_img = PhotoImage(file='imgs/pause_img.png')
         self.skip_btn_img = PhotoImage(file='imgs/skip_img.png')
         self.prev_btn_img = PhotoImage(file='imgs/prev_img.png')
         self.stop_btn_img = PhotoImage(file='imgs/stop_img.png')
+        #initialize buttons
+        self.play_btn = Button(self.controls_frame, image=self.play_btn_img, borderwidth=0, command=lambda:play())
+        self.pause_btn = Button(self.controls_frame, image=self.pause_btn_img, borderwidth=0, command=lambda:pause(paused))
+        self.skip_btn = Button(self.controls_frame, image=self.skip_btn_img, borderwidth=0, command=lambda:skip())
+        self.prev_btn = Button(self.controls_frame, image=self.prev_btn_img, borderwidth=0, command=lambda:prev())
+        self.stop_btn = Button(self.controls_frame, image=self.stop_btn_img, borderwidth=0, command=lambda:stop())
+        self.volume_slider = ttk.Scale(self.controls_frame, from_=0,to_=1, orient=HORIZONTAL,
+            value=0.5, command=volume, length=100)
+        
+        #initialize song position slider
+        self.position_bar = Label(self.song_slider_frame, width=10, text='', bd=1, relief=GROOVE)
+        self.slider_label = Label(self.song_slider_frame, text='', width=5, bd=1, relief=GROOVE)
+        self.length_bar = Label(self.song_slider_frame, width=5, text='', bd=1, relief=GROOVE)
+        #Song position slider
+        self.position_slider = ttk.Scale(self.song_slider_frame, from_=0, to_=100, 
+            orient=HORIZONTAL, value=0, command=position_slide, length=250)
+        
+        """CONTROL GRID PLACEMENTS"""
+        #slider grid placements
+        self.slider_label.grid(row=0,column=1)
+        self.length_bar.grid(row=0, column=3)
+        self.position_slider.grid(row=0, column=2, pady=0)
+        #button grid placements
+        self.play_btn.grid(row=1, column=1, padx=10)
+        self.pause_btn.grid(row=1, column=2, padx=10)
+        self.skip_btn.grid(row=1, column=3, padx=10)
+        self.prev_btn.grid(row=1, column=0, padx=10)
+        self.stop_btn.grid(row=1, column=4, padx=10)
+        self.volume_slider.grid(row=1, column=5)
 
-        #initialize playlist area and menu
-        self.playlist_box = Listbox(self, bg="white", fg="black", width=65, height=20, selectbackground="dodger blue", selectforeground="white")
-       
+        """PLAYLIST INITIALIZATION"""
+        self.playlist_box = Listbox(self.playlist_frame, bg="white", fg="black", 
+            selectbackground="dodger blue", selectforeground="white", selectmode=tk.SINGLE)
+        self.playlist_box.grid(row=0,column=1, rowspan=1)
+        self.playlist_box.config(height=22, width=30)
+        
+        """MENU INITIALIZATION"""
         #menu bar
         self.menu_ = Menu(self)
         master.config(menu=self.menu_)
@@ -166,45 +223,12 @@ class Application (Frame):
         
         self.file_menu.add_separator()
         self.file_menu.add_command(label="Exit", command=master.quit)
-
-        #initialize buttons
-        self.buttons_frame = Frame(self)
-        self.play_btn = Button(self.buttons_frame, image=self.play_btn_img, borderwidth=0, command=lambda:play())
-        self.pause_btn = Button(self.buttons_frame, image=self.pause_btn_img, borderwidth=0, command=lambda:pause(paused))
-        self.skip_btn = Button(self.buttons_frame, image=self.skip_btn_img, borderwidth=0, command=lambda:skip())
-        self.prev_btn = Button(self.buttons_frame, image=self.prev_btn_img, borderwidth=0, command=lambda:prev())
-        self.stop_btn = Button(self.buttons_frame, image=self.stop_btn_img, borderwidth=0, command=lambda:stop())
-
-        #Song position bar
-        self.position_frame = Frame(self)
-        #self.position_bar = Label(self.position_frame, width=10, text='', bd=1, relief=GROOVE)
-        self.length_bar = Label(self.position_frame, width=10, text='', bd=1, relief=GROOVE)
-        #Song position slider
-        self.position_slider = ttk.Scale(self.position_frame, from_=0, to_=100, orient=HORIZONTAL, value=0, command=position_slide, length=360)
-        self.slider_label = Label(self.position_frame, text='', width=10, bd=1, relief=GROOVE)
-        
-        #UI item placements
         self.grid(row=0,column=0)
         master.columnconfigure(0,weight=1)
         master.rowconfigure(0,weight=1)
-        #buttons
-        self.buttons_frame.grid(row=0, column = 3)
-        self.position_frame.grid(row=1, column=3, pady=10)
-        self.play_btn.grid(row=1, column=2, padx=10)
-        self.pause_btn.grid(row=1, column=3, padx=10)
-        self.skip_btn.grid(row=1, column=4, padx=10)
-        self.prev_btn.grid(row=1, column=1, padx=10)
-        self.stop_btn.grid(row=1, column=5, padx=10)
-        #playlist box
-        self.playlist_box.grid(row=3,column=3)
-        #song pos slider
-        self.slider_label.grid(row=1,column=2)
-        self.length_bar.grid(row=1, column=4)
-        self.position_slider.grid(row=1, column=3)
-        
-        #self.pack()
+
 root = tk.Tk()
 root.title("Music Player")
 app = Application(root)
-root.geometry("600x500")
+root.geometry('600x400')
 root.mainloop()
