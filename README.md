@@ -14,3 +14,5 @@ Functions:
       - Playlist serialization  
       - Display song cover art  
 ![Alt text](schau_musicplayer.PNG?raw=true "SC Music Player")  
+  
+![Demo](https://www.youtube.com/watch?v=dN4aIg6ZBvA&feature=youtu.be)  
