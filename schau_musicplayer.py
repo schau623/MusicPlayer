@@ -261,6 +261,9 @@ class Application (Frame):
             self.playlist_frame.config(text=f'Playlist - {str(len(self.playlist))} Song')
         else:
             self.playlist_frame.config(text=f'Playlist - {str(len(self.playlist))} Songs')
+
+        with open('songs.pickle', 'wb') as f:
+            pickle.dump(self.playlist, f)
         
 
     def clear_playlist(self):
@@ -270,6 +273,8 @@ class Application (Frame):
         self.track_bar.config(text='')
         self.playlist_frame.config(text=f'Playlist - 0 Songs')
         self.stop()
+        with open('songs.pickle', 'wb') as f:
+            pickle.dump(self.playlist, f)
 
     #song position time function
     def play_time(self):
