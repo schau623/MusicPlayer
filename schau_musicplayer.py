@@ -270,11 +270,11 @@ class Application (Frame):
         self.playlist_box.delete(0, END)
         for i in range (len(self.playlist)):
             self.playlist.pop()
+        with open('songs.pickle', 'wb') as f:
+            pickle.dump(self.playlist, f)
         self.track_bar.config(text='')
         self.playlist_frame.config(text=f'Playlist - 0 Songs')
         self.stop()
-        with open('songs.pickle', 'wb') as f:
-            pickle.dump(self.playlist, f)
 
     #song position time function
     def play_time(self):
