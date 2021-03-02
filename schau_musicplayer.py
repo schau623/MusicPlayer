@@ -234,10 +234,10 @@ class Application (Frame):
     def loop_activate(self):
         if self.loop_flag == 0:
             self.loop_flag = -1
-            self.loop_btn.config(image=loop_on_btn_img)
+            self.loop_btn.config(image=self.loop_on_btn_img)
         else:
             self.loop_flag = 0
-            self.loop_btn.config(image=loop_btn_img)
+            self.loop_btn.config(image=self.loop_btn_img)
 
     def add_song(self):
         #get song file directory
