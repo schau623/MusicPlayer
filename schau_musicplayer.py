@@ -1,3 +1,4 @@
+
 from tkinter import *
 import tkinter as tk
 from tkinter import filedialog
@@ -23,6 +24,17 @@ class Application (Frame):
             self.playlist = pickle.load(open('songs.pickle', 'rb'))
         else:
             self.playlist=[]
+        """IMAGE INITIALIZATION"""
+        self.pause_btn_img = PhotoImage(file='imgs/play_img.png')
+        self.play_btn_img = PhotoImage(file='imgs/pause_img.png')
+        self.skip_btn_img = PhotoImage(file='imgs/skip_img.png')
+        self.prev_btn_img = PhotoImage(file='imgs/prev_img.png')
+        self.stop_btn_img = PhotoImage(file='imgs/stop_img.png')
+        self.loop_btn_img = PhotoImage(file='imgs/loop_img.png')
+        self.loop_on_btn_img = PhotoImage(file='imgs/loop_on_img.png')
+        self.cover_img = PhotoImage(file='imgs/placeholder_cover.png')
+        self.cover_img2 = PhotoImage(file='imgs/001.png')
+        self.cover_img = self.cover_img.subsample(x=2, y=2)
 
         self.current = 0
         self.paused = True
@@ -57,11 +69,11 @@ class Application (Frame):
         """CONTROL INITIALIZATION"""
         #initialize buttons
         #self.play_btn = Button(self.controls_frame, image=self.play_btn_img, borderwidth=0, command=lambda:play())
-        self.pause_btn = Button(self.controls_frame, image=pause_btn_img, borderwidth=0, command=lambda:self.pause())
-        self.skip_btn = Button(self.controls_frame, image=skip_btn_img, borderwidth=0, command=lambda:self.skip())
-        self.prev_btn = Button(self.controls_frame, image=prev_btn_img, borderwidth=0, command=lambda:self.prev())
-        self.stop_btn = Button(self.controls_frame, image=stop_btn_img, borderwidth=0, command=lambda:self.stop())
-        self.loop_btn = Button(self.controls_frame, image=loop_btn_img,borderwidth=0, command=self.loop_activate)
+        self.pause_btn = Button(self.controls_frame, image=self.pause_btn_img, borderwidth=0, command=lambda:self.pause())
+        self.skip_btn = Button(self.controls_frame, image=self.skip_btn_img, borderwidth=0, command=lambda:self.skip())
+        self.prev_btn = Button(self.controls_frame, image=self.prev_btn_img, borderwidth=0, command=lambda:self.prev())
+        self.stop_btn = Button(self.controls_frame, image=self.stop_btn_img, borderwidth=0, command=lambda:self.stop())
+        self.loop_btn = Button(self.controls_frame, image=self.loop_btn_img,borderwidth=0, command=self.loop_activate)
         self.volume_slider = ttk.Scale(self.controls_frame, from_=0,to_=1, orient=HORIZONTAL,
             value=0.1, command=self.volume, length=100)
         #initialize song position slider
@@ -100,7 +112,7 @@ class Application (Frame):
         self.playlist_box.grid(row=0,column=0, rowspan=5)
 
         """DISPLAY INITIALIZATION"""
-        self.canvas = Label(self.display_frame, image=cover_img)
+        self.canvas = Label(self.display_frame, image=self.cover_img)
         #self.canvas.config(width=200, height=200)
         self.canvas.grid(row=0,column=0)
         self.track_bar = Label(self.display_frame, font=15, text='')
@@ -145,7 +157,7 @@ class Application (Frame):
 
         self.paused = False
         self.played = True
-        self.pause_btn.config(image=play_btn_img)
+        self.pause_btn.config(image=self.play_btn_img)
         self.playlist_box.activate(self.current) 
         self.playlist_box.itemconfigure(self.current, bg='sky blue')
         self.track_bar.config(text=self.playlist_box.get(ACTIVE))
@@ -156,13 +168,13 @@ class Application (Frame):
         if not self.paused:
             self.paused = True
             pygame.mixer.music.pause()
-            self.pause_btn.config(image=pause_btn_img)
+            self.pause_btn.config(image=self.pause_btn_img)
         else:
             if self.played == False:
                 self.play()
             self.paused = False
             pygame.mixer.music.unpause()
-            self.pause_btn.config(image=play_btn_img)
+            self.pause_btn.config(image=self.play_btn_img)
         
     def prev(self, event=None):
         #if song has been playing for more than 3 seconds, return to start of song
@@ -179,7 +191,7 @@ class Application (Frame):
                 self.current = 0
             self.playlist_box.itemconfigure(self.current + 1, bg='white')
             self.play()
-            
+
     #only activated once current song as finished playing; autoplay feature
     def next_song(self):
         self.master.focus_set()
@@ -209,8 +221,8 @@ class Application (Frame):
     
     def stop(self):
         #clear all text and cover image
-        self.canvas.config(image = cover_img)
-        self.canvas.image = cover_img
+        self.canvas.config(image = self.cover_img)
+        self.canvas.image = self.cover_img
         self.slider_label.config(text='')
         self.length_bar.config(text='')
         self.position_slider.config(value=0)
@@ -219,6 +231,7 @@ class Application (Frame):
         self.paused = True
         self.played = False
         pygame.mixer.music.stop()
+        self.pause_btn.config(image=self.pause_btn_img)
         self.playlist_box.itemconfigure(self.current, bg='white')
         self.playlist_box.selection_clear(ACTIVE)
 
@@ -249,12 +262,14 @@ class Application (Frame):
         with open('songs.pickle', 'wb') as f:
             pickle.dump(self.playlist, f)
         #list songs
-        self.enumerate_songs()
+        #self.enumerate_songs()
     
     #when app is opened, relist all pickled songs
     def enumerate_songs(self):
         for index, song in enumerate(self.playlist):
-            self.playlist_box.insert(index, os.path.basename(song))
+            tag = TinyTag.get(song)
+            song_title = tag.title
+            self.playlist_box.insert(index, os.path.basename(song_title))
 
     def remove_song(self):
         song = self.playlist_box.curselection()
@@ -268,6 +283,10 @@ class Application (Frame):
         else:
             self.playlist_frame.config(text=f'Playlist - {str(len(self.playlist))} Songs')
         #Rewrite pickle file
+        emptylist = []
+        with open('songs.pickle', 'wb') as o:
+            pickle.dump(emptylist, o)
+
         with open('songs.pickle', 'wb') as f:
             pickle.dump(self.playlist, f)
         
@@ -277,8 +296,9 @@ class Application (Frame):
         for i in range (len(self.playlist)):
             self.playlist.pop()
         #Rewrite pickle file
-        with open('songs.pickle', 'wb') as f:
-            pickle.dump(self.playlist, f)
+        emptylist = []
+        with open('songs.pickle', 'wb') as o:
+            pickle.dump(emptylist, o)
         self.track_bar.config(text='')
         self.playlist_frame.config(text=f'Playlist - 0 Songs')
         self.stop()
@@ -328,20 +348,9 @@ class Application (Frame):
         pygame.mixer.music.set_volume(self.volume_slider.get())
         current_volume = pygame.mixer.music.get_volume()
         current_volume = current_volume*100
-
-root = tk.Tk()
-root.title("Music Player")
-pause_btn_img = PhotoImage(file='imgs/play_img.png')
-play_btn_img = PhotoImage(file='imgs/pause_img.png')
-skip_btn_img = PhotoImage(file='imgs/skip_img.png')
-prev_btn_img = PhotoImage(file='imgs/prev_img.png')
-stop_btn_img = PhotoImage(file='imgs/stop_img.png')
-loop_btn_img = PhotoImage(file='imgs/loop_img.png')
-loop_on_btn_img = PhotoImage(file='imgs/loop_on_img.png')
-cover_img = PhotoImage(file='imgs/placeholder_cover.png')
-cover_img2 = PhotoImage(file='imgs/001.png')
-cover_img = cover_img.subsample(x=2, y=2)
-
-app = Application(root)
-root.geometry('700x400')
-root.mainloop()
+if __name__ == '__main__':
+    root = tk.Tk()
+    root.title("Music Player")
+    app = Application(root)
+    root.geometry('700x400')
+    root.mainloop()
