@@ -13,4 +13,4 @@ Functions:
       - Loop  
       - Playlist serialization  
       - Display song cover art  
-![alt text] (https://github.com/schau623/MusicPlayer/blob/main/schau_musicplayer.py?raw=true)
+![alt text] (https://github.com/schau623/MusicPlayer/blob/main/schau_musicplayer.PNG?raw=true)
