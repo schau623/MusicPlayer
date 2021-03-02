@@ -63,7 +63,6 @@ class Application (Frame):
         self.playlist_frame.config(width=190, height=400)
         self.playlist_frame.grid(row=0,column=1, rowspan=3, pady=5)
         self.song_slider_frame.grid(row=1, column=0)
-        #self.song_slider_frame.place(x=0, y=260, height=30)
         self.display_frame.grid(row=0, column=0)
     def create_controls(self):
         """CONTROL INITIALIZATION"""
@@ -77,7 +76,6 @@ class Application (Frame):
         self.volume_slider = ttk.Scale(self.controls_frame, from_=0,to_=1, orient=HORIZONTAL,
             value=0.1, command=self.volume, length=100)
         #initialize song position slider
-        #self.position_bar = Label(self.song_slider_frame, width=10, text='', bd=1, relief=GROOVE)
         self.slider_label = Label(self.song_slider_frame, text='', width=5)
         self.length_bar = Label(self.song_slider_frame, width=5, text='')
         #Song position slider
@@ -90,7 +88,6 @@ class Application (Frame):
         self.length_bar.grid(row=0, column=3)
         self.position_slider.grid(row=0, column=2, pady=0)
         #button grid placements
-        #self.play_btn.grid(row=1, column=1, padx=10)
         self.pause_btn.grid(row=1, column=2, padx=10)
         self.skip_btn.grid(row=1, column=3, padx=10)
         self.prev_btn.grid(row=1, column=1, padx=10)
@@ -113,7 +110,6 @@ class Application (Frame):
 
         """DISPLAY INITIALIZATION"""
         self.canvas = Label(self.display_frame, image=self.cover_img)
-        #self.canvas.config(width=200, height=200)
         self.canvas.grid(row=0,column=0)
         self.track_bar = Label(self.display_frame, font=15, text='')
         self.track_bar.config(width=30,height=1)
@@ -261,8 +257,6 @@ class Application (Frame):
         #write songs to pickle
         with open('songs.pickle', 'wb') as f:
             pickle.dump(self.playlist, f)
-        #list songs
-        #self.enumerate_songs()
     
     #when app is opened, relist all pickled songs
     def enumerate_songs(self):
