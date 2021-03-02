@@ -286,17 +286,17 @@ class Application (Frame):
         
 
     def clear_playlist(self):
+        self.stop()
         self.playlist_box.delete(0, END)
         for i in range (len(self.playlist)):
             self.playlist.pop()
-        self.stop()
         #Rewrite pickle file
         emptylist = []
         with open('songs.pickle', 'wb') as o:
             pickle.dump(emptylist, o)
         self.track_bar.config(text='')
         self.playlist_frame.config(text=f'Playlist - 0 Songs')
-
+        
     #song position time function
     def play_time(self):
         if self.paused == False:
