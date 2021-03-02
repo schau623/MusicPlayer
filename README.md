@@ -13,4 +13,4 @@ Functions:
       - Loop  
       - Playlist serialization  
       - Display song cover art  
-![alt text](relative/path/to/schau_musicplayer.PNG?raw=true)
+![Alt text](schau_musicplayer.png?raw=true SC Music Player")
