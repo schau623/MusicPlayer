@@ -63,7 +63,6 @@ class Application (Frame):
         self.loop_btn = Button(self.controls_frame, image=loop_btn_img,borderwidth=0, command=self.loop_activate)
         self.volume_slider = ttk.Scale(self.controls_frame, from_=0,to_=1, orient=HORIZONTAL,
             value=0.1, command=self.volume, length=100)
-        
         #initialize song position slider
         #self.position_bar = Label(self.song_slider_frame, width=10, text='', bd=1, relief=GROOVE)
         self.slider_label = Label(self.song_slider_frame, text='', width=5)
@@ -88,12 +87,17 @@ class Application (Frame):
 
     def create_playlist_display(self):
         """PLAYLIST INITIALIZATION"""
+        self.scrollbar = tk.Scrollbar(self.playlist_frame, orient=tk.VERTICAL)
+        self.scrollbar.grid(row=0,column=1, rowspan=5, sticky='ns')
         self.playlist_box = Listbox(self.playlist_frame, bg="white", fg="black", 
-            selectbackground="dodger blue", selectforeground="white", selectmode=tk.SINGLE)
-        self.playlist_box.grid(row=0,column=1, rowspan=1)
+            selectbackground="dodger blue", selectforeground="white",
+             selectmode=tk.SINGLE, yscrollcommand=self.scrollbar.set)
         self.playlist_box.config(height=22, width=30)
         self.playlist_box.bind('<Double-1>', self.play)
-        
+
+        self.scrollbar.config(command=self.playlist_box.yview)
+        self.playlist_box.grid(row=0,column=0, rowspan=5)
+
         """DISPLAY INITIALIZATION"""
         self.canvas = Label(self.display_frame, image=cover_img)
         #self.canvas.config(width=200, height=200)
@@ -128,8 +132,9 @@ class Application (Frame):
             for i in range(len(self.playlist)):
                 self.playlist_box.itemconfigure(i, bg="white")
         pygame.mixer.music.load(self.playlist[self.current])
-        
-        #self.pause['image'] = play
+       # song_file = File(self.playlist[self.current])
+        #artwork = song_file.tags['APIC:'].data
+        #self.canvas.config(image=artwork)
         self.paused = False
         self.played = True
         self.pause_btn.config(image=play_btn_img)
