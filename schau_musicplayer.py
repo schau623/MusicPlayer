@@ -125,7 +125,6 @@ class Application (Frame):
         self.master.rowconfigure(0,weight=1)
 
     #button/menu functions
-        
     def play(self, event=None):
         self.position_slider.config(value=0)
         if event is not None:
@@ -143,7 +142,7 @@ class Application (Frame):
         img = ImageTk.PhotoImage(pi)
         self.canvas.config(image = img)
         self.canvas.image = img
-       
+
         self.paused = False
         self.played = True
         self.pause_btn.config(image=play_btn_img)
@@ -166,10 +165,12 @@ class Application (Frame):
             self.pause_btn.config(image=play_btn_img)
         
     def prev(self, event=None):
+        #if song has been playing for more than 3 seconds, return to start of song
         if self.position_slider.get() > 3:
             self.position_slider.config(value=0)
             pygame.mixer.music.rewind()
-            
+
+        #play previous song in playlist
         elif len(self.playlist) > 1:
             self.master.focus_set()
             if self.current > 0:
@@ -178,7 +179,8 @@ class Application (Frame):
                 self.current = 0
             self.playlist_box.itemconfigure(self.current + 1, bg='white')
             self.play()
-
+            
+    #only activated once current song as finished playing; autoplay feature
     def next_song(self):
         self.master.focus_set()
         if self.current == len(self.playlist)-1:
@@ -195,6 +197,7 @@ class Application (Frame):
             
     def skip(self):
         self.master.focus_set()
+        #if current song is last in playlist, return to top of playlist
         if self.current == len(self.playlist)-1:
             self.playlist_box.itemconfigure(self.current, bg='white')
             self.current = 0
@@ -205,18 +208,19 @@ class Application (Frame):
             self.play()
     
     def stop(self):
+        #clear all text and cover image
         self.canvas.config(image = cover_img)
         self.canvas.image = cover_img
         self.slider_label.config(text='')
         self.length_bar.config(text='')
         self.position_slider.config(value=0)
         self.track_bar.config(text='')
+
         self.paused = True
         self.played = False
         pygame.mixer.music.stop()
         self.playlist_box.itemconfigure(self.current, bg='white')
         self.playlist_box.selection_clear(ACTIVE)
-        #self.position_bar.config(text='')
 
     def loop_activate(self):
         if self.loop_flag == 0:
@@ -241,18 +245,20 @@ class Application (Frame):
             self.playlist_frame.config(text=f'Playlist - {str(len(self.playlist))} Song')
         else:
             self.playlist_frame.config(text=f'Playlist - {str(len(self.playlist))} Songs')
-        
+        #write songs to pickle
         with open('songs.pickle', 'wb') as f:
             pickle.dump(self.playlist, f)
+        #list songs
         self.enumerate_songs()
     
+    #when app is opened, relist all pickled songs
     def enumerate_songs(self):
         for index, song in enumerate(self.playlist):
             self.playlist_box.insert(index, os.path.basename(song))
 
     def remove_song(self):
         song = self.playlist_box.curselection()
-        if(self.current == song[0]):
+        if(self.current == song[0]): #if removed song is currently playing, stop
             self.stop()
         self.playlist.remove(self.playlist[int(song[0])])
         self.playlist_box.delete(song)
@@ -261,7 +267,7 @@ class Application (Frame):
             self.playlist_frame.config(text=f'Playlist - {str(len(self.playlist))} Song')
         else:
             self.playlist_frame.config(text=f'Playlist - {str(len(self.playlist))} Songs')
-
+        #Rewrite pickle file
         with open('songs.pickle', 'wb') as f:
             pickle.dump(self.playlist, f)
         
@@ -270,6 +276,7 @@ class Application (Frame):
         self.playlist_box.delete(0, END)
         for i in range (len(self.playlist)):
             self.playlist.pop()
+        #Rewrite pickle file
         with open('songs.pickle', 'wb') as f:
             pickle.dump(self.playlist, f)
         self.track_bar.config(text='')
