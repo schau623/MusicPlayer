@@ -9,6 +9,8 @@ from mutagen import File
 import tkinter.ttk as ttk
 import pickle
 import os
+from PIL import Image, ImageTk
+import io
 
 class Application (Frame):
     def __init__(self, master=None):
@@ -17,13 +19,11 @@ class Application (Frame):
         self.pack()
         pygame.mixer.init()
         self.prev_rewind = 0
-        """
         if os.path.exists('songs.pickle'):
-            playlist = pickle.load( open('songs.pickle', 'rb'))
+            self.playlist = pickle.load(open('songs.pickle', 'rb'))
         else:
-            playlist=[]
-        """ 
-        self.playlist = []
+            self.playlist=[]
+
         self.current = 0
         self.paused = True
         self.played = False
@@ -32,6 +32,7 @@ class Application (Frame):
         self.create_controls()
         self.create_playlist_display()
         self.create_menu()
+        self.enumerate_songs()
         self.master.bind('<space>', self.pause)
         pygame.mixer.music.set_volume(0.1)
     def create_frames(self):
@@ -40,10 +41,10 @@ class Application (Frame):
         #initialization
         self.controls_frame = Frame(self)
         self.playlist_frame = LabelFrame(self, text=f'Playlist - {str(len(self.playlist))} Songs',
-           font=15, bd=5,relief=tk.GROOVE)
+           font=15, bd=0)
         self.playlist_frame.config(width=190,height=400)
         self.song_slider_frame = Frame(self)
-        self.display_frame = LabelFrame(self, bd=5, relief=tk.GROOVE)
+        self.display_frame = LabelFrame(self, bd=0)
         
         #frame grid placements
         self.controls_frame.grid(row=2, column=0, padx=10)
@@ -124,7 +125,7 @@ class Application (Frame):
         self.master.rowconfigure(0,weight=1)
 
     #button/menu functions
-
+        
     def play(self, event=None):
         self.position_slider.config(value=0)
         if event is not None:
@@ -132,9 +133,17 @@ class Application (Frame):
             for i in range(len(self.playlist)):
                 self.playlist_box.itemconfigure(i, bg="white")
         pygame.mixer.music.load(self.playlist[self.current])
-       # song_file = File(self.playlist[self.current])
-        #artwork = song_file.tags['APIC:'].data
-        #self.canvas.config(image=artwork)
+        
+        #display cover art of song
+        song_file = TinyTag.get(self.playlist[self.current], image=True)
+        artwork = song_file.get_image()
+        pi = Image.open(io.BytesIO(artwork))
+        max_size = (250, 250)
+        pi.thumbnail(max_size)
+        img = ImageTk.PhotoImage(pi)
+        self.canvas.config(image = img)
+        self.canvas.image = img
+       
         self.paused = False
         self.played = True
         self.pause_btn.config(image=play_btn_img)
@@ -196,6 +205,8 @@ class Application (Frame):
             self.play()
     
     def stop(self):
+        self.canvas.config(image = cover_img)
+        self.canvas.image = cover_img
         self.slider_label.config(text='')
         self.length_bar.config(text='')
         self.position_slider.config(value=0)
@@ -214,23 +225,6 @@ class Application (Frame):
         else:
             self.loop_flag = 0
             self.loop_btn.config(image=loop_btn_img)
-    """
-    def loop(self):
-        if self.loop_flag == 0:
-            self.loop_flag = 1
-            self.loop_btn.config(image=loop_on_btn_img)
-            current_song = self.playlist_box.curselection()
-            song_mut = MP3(self.playlist[self.current])
-            self.song_length = song_mut.info.length
-            if int(self.song_length) == int(self.slider_label):
-                pygame.mixer.music.rewind()
-
-        else:
-            self.loop_flag = 0
-            self.loop_btn.config(image=loop_btn_img)
-            return
-        """
-        
 
     def add_song(self):
         #get song file directory
@@ -247,6 +241,14 @@ class Application (Frame):
             self.playlist_frame.config(text=f'Playlist - {str(len(self.playlist))} Song')
         else:
             self.playlist_frame.config(text=f'Playlist - {str(len(self.playlist))} Songs')
+        
+        with open('songs.pickle', 'wb') as f:
+            pickle.dump(self.playlist, f)
+        self.enumerate_songs()
+    
+    def enumerate_songs(self):
+        for index, song in enumerate(self.playlist):
+            self.playlist_box.insert(index, os.path.basename(song))
 
     def remove_song(self):
         song = self.playlist_box.curselection()
@@ -324,8 +326,10 @@ prev_btn_img = PhotoImage(file='imgs/prev_img.png')
 stop_btn_img = PhotoImage(file='imgs/stop_img.png')
 loop_btn_img = PhotoImage(file='imgs/loop_img.png')
 loop_on_btn_img = PhotoImage(file='imgs/loop_on_img.png')
-cover_img = PhotoImage(file='imgs/Cover.png')
+cover_img = PhotoImage(file='imgs/placeholder_cover.png')
+cover_img2 = PhotoImage(file='imgs/001.png')
 cover_img = cover_img.subsample(x=2, y=2)
+
 app = Application(root)
 root.geometry('700x400')
 root.mainloop()
