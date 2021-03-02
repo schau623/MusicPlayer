@@ -1,6 +1,6 @@
 # MusicPlayer
 Custom music player made using Python. UI created using Tkinter, Python's standard GUI toolkit  
-Current Functions:  
+Functions:  
       - Play  
       - Pause  
       - Stop  
@@ -11,3 +11,5 @@ Current Functions:
       - Song position slider  
       - Volume slider  
       - Loop  
+      - Playlist serialization  
+      - Display song cover art  
