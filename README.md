@@ -14,7 +14,10 @@ Functions:
       - Playlist serialization  
       - Display song cover art  
    
+## Installation
+Download the installer file and execute it to install the program.
+  
+## Demo  
 ![Alt text](schau_musicplayer.PNG?raw=true "SC Music Player")  
   
-Demo:  
 [![Alt text](https://img.youtube.com/vi/dN4aIg6ZBvA/0.jpg)](https://www.youtube.com/watch?v=dN4aIg6ZBvA&feature=youtu.be)  
